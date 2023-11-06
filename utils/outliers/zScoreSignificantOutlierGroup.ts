@@ -1,9 +1,11 @@
 import { InsightAlgorithmWithGroup } from "../../types";
 
-const defaultWriteInsight = ({ groupName }) =>
-  `${groupName} is a significant outlier.`;
+const defaultWriteInsight = ({ groupName, positive }) =>
+  `[${groupName}] is a significant ${
+    positive ? "positive" : "negative"
+  } outlier compared to the other groups.`;
 
-export const zScoreSignificantOutlierGroup: InsightAlgorithmWithGroup = (
+const zScoreSignificantOutlierGroup: InsightAlgorithmWithGroup = (
   data,
   valueGetter,
   groupGetter,
@@ -59,12 +61,15 @@ export const zScoreSignificantOutlierGroup: InsightAlgorithmWithGroup = (
     }
   }
 
-  // console.log("Created insight");
-
   // Create the insight if a significant outlier group is found
   if (significantOutlierGroup) {
-    return writeInsight({ groupName: significantOutlierGroup });
+    return writeInsight({
+      groupName: significantOutlierGroup,
+      positive: significantOutlierZScore > 0,
+    });
   }
 
   return null;
 };
+
+export default zScoreSignificantOutlierGroup;

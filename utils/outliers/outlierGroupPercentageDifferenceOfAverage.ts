@@ -7,97 +7,109 @@
 
 import { InsightAlgorithmWithGroup } from "../../types";
 
+// const writeInsight = ({ groupName, positive, differencePercentage }) =>
+//   `${groupName} scored ${differencePercentage.toFixed(2)}% ${
+//     positive ? "higher" : "lower"
+//   } than the average of all other schools.`;
+
 const defaultWriteInsight = ({ groupName, positive, differencePercentage }) =>
   `${groupName} is ${differencePercentage.toFixed(2)}% ${
     positive ? "higher" : "lower"
   } than the average of all groups.`;
 
-export const outlierGroupPercentageDifferenceOfAverage: InsightAlgorithmWithGroup =
-  (data, valueGetter, groupGetter, writeInsight = defaultWriteInsight) => {
-    if (!groupGetter(data[0])) {
-      throw new Error(`Could not find group in data`);
-    }
+const outlierGroupPercentageDifferenceOfAverage: InsightAlgorithmWithGroup = (
+  data,
+  valueGetter,
+  groupGetter,
+  writeInsight = defaultWriteInsight
+) => {
+  if (!groupGetter(data[0])) {
+    throw new Error(`Could not find group in data`);
+  }
 
-    const valuesByGroup: Record<string, number[]> = data.reduce(
-      (acc, datapoint) => {
-        const result = { ...acc };
+  const valuesByGroup: Record<string, number[]> = data.reduce(
+    (acc, datapoint) => {
+      const result = { ...acc };
 
-        const groupName = groupGetter(datapoint);
-        const value = valueGetter(datapoint);
+      const groupName = groupGetter(datapoint);
+      const value = valueGetter(datapoint);
 
-        if (!result[groupName]) {
-          result[groupName] = [];
-        }
+      if (!result[groupName]) {
+        result[groupName] = [];
+      }
 
-        result[groupName].push(value);
+      result[groupName].push(value);
 
-        return result;
-      },
-      {} as Record<string, number[]>
-    );
+      return result;
+    },
+    {} as Record<string, number[]>
+  );
 
-    const averageValueByGroup = Object.entries(valuesByGroup).reduce(
-      (acc, [group, values]) => {
-        const result = { ...acc };
+  const averageValueByGroup = Object.entries(valuesByGroup).reduce(
+    (acc, [group, values]) => {
+      const result = { ...acc };
 
-        const averageValue =
-          values.reduce((acc, value) => {
-            return acc + value;
-          }, 0) / values.length;
+      const averageValue =
+        values.reduce((acc, value) => {
+          return acc + value;
+        }, 0) / values.length;
 
-        result[group] = averageValue;
+      result[group] = averageValue;
 
-        return result;
-      },
-      {} as Record<string, number>
-    );
+      return result;
+    },
+    {} as Record<string, number>
+  );
 
-    // console.log(averageValueByGroup);
+  // console.log(averageValueByGroup);
 
-    const averageValueAllGroups =
-      Object.entries(averageValueByGroup).reduce(
-        (sum, [, value]) => sum + value,
-        0
-      ) / Object.keys(averageValueByGroup).length;
+  const averageValueAllGroups =
+    Object.entries(averageValueByGroup).reduce(
+      (sum, [, value]) => sum + value,
+      0
+    ) / Object.keys(averageValueByGroup).length;
 
-    const distanceFromAverageByGroup = Object.entries(
-      averageValueByGroup
-    ).reduce((acc, [group, value]) => {
+  const distanceFromAverageByGroup = Object.entries(averageValueByGroup).reduce(
+    (acc, [group, value]) => {
       const result = { ...acc };
 
       result[group] = value - averageValueAllGroups;
 
       return result;
-    }, {} as Record<string, number>);
+    },
+    {} as Record<string, number>
+  );
 
-    // console.log(distanceFromAverageByGroup);
+  // console.log(distanceFromAverageByGroup);
 
-    // Return group [name, value] with the highest absolute value of value
-    const groupOfInterest = Object.entries(distanceFromAverageByGroup).reduce(
-      (acc, [group, value]) => {
-        if (acc[1] === null || Math.abs(value) > Math.abs(acc[1])) {
-          return [group, value];
-        }
+  // Return group [name, value] with the highest absolute value of value
+  const groupOfInterest = Object.entries(distanceFromAverageByGroup).reduce(
+    (acc, [group, value]) => {
+      if (acc[1] === null || Math.abs(value) > Math.abs(acc[1])) {
+        return [group, value];
+      }
 
-        return acc;
-      },
-      [null, null] as [string | null, number | null]
-    );
-    const [groupOfInterestName] = groupOfInterest;
+      return acc;
+    },
+    [null, null] as [string | null, number | null]
+  );
+  const [groupOfInterestName] = groupOfInterest;
 
-    const groupAverage = averageValueByGroup[groupOfInterestName];
-    const difference = groupAverage - averageValueAllGroups;
-    const positive = difference >= 0;
-    let differencePercentage = (difference / averageValueAllGroups) * 100;
-    differencePercentage = positive
-      ? differencePercentage
-      : -differencePercentage;
+  const groupAverage = averageValueByGroup[groupOfInterestName];
+  const difference = groupAverage - averageValueAllGroups;
+  const positive = difference >= 0;
+  let differencePercentage = (difference / averageValueAllGroups) * 100;
+  differencePercentage = positive
+    ? differencePercentage
+    : -differencePercentage;
 
-    // console.log("Created insight");
-    return writeInsight({
-      groupName: groupOfInterestName,
-      difference,
-      differencePercentage,
-      positive,
-    });
-  };
+  // console.log("Created insight");
+  return writeInsight({
+    groupName: groupOfInterestName,
+    difference,
+    differencePercentage,
+    positive,
+  });
+};
+
+export default outlierGroupPercentageDifferenceOfAverage;

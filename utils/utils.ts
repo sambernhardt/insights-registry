@@ -29,6 +29,30 @@ export async function getFileContents<T>(filePath, headers) {
   });
 }
 
+export async function getCSVContents<T>(fileContent) {
+  return new Promise<T[]>((resolve, reject) => {
+    const contents = fileContent.trim();
+    const headerRow = contents.split("\n")[0].split(",");
+    const body = contents.split("\n").slice(1).join("\n");
+
+    parse(
+      body,
+      {
+        delimiter: ",",
+        columns: headerRow,
+        cast: true,
+      },
+      (error, result: T[]) => {
+        if (error) {
+          reject(error);
+        }
+
+        resolve(result);
+      }
+    );
+  });
+}
+
 export function uniqueArrayItems(array) {
   return array.filter(function (value, index, self) {
     return self.indexOf(value) === index;
