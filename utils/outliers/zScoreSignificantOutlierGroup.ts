@@ -1,16 +1,22 @@
-import { InsightAlgorithmWithGroup } from "../../types";
+import { Dataset, Grouping } from "../../types";
 
 const defaultWriteInsight = ({ groupName, positive }) =>
   `[${groupName}] is a significant ${
     positive ? "positive" : "negative"
   } outlier compared to the other groups.`;
 
-const zScoreSignificantOutlierGroup: InsightAlgorithmWithGroup = (
-  data,
-  valueGetter,
-  groupGetter,
-  writeInsight = defaultWriteInsight
-) => {
+const zScoreSignificantOutlierGroup = ({
+  dataset,
+  grouping,
+  writeInsight = defaultWriteInsight,
+}: {
+  dataset: Dataset;
+  grouping: Grouping;
+  writeInsight;
+}) => {
+  const { data, valueGetter } = dataset;
+  const { getter: groupGetter } = grouping;
+
   if (!groupGetter(data[0])) {
     throw new Error(`Could not find group in data`);
   }

@@ -5,7 +5,7 @@
  * Eg. "Group A scored 10% better than the average of all other groups."
  */
 
-import { InsightAlgorithmWithGroup } from "../../types";
+import { Dataset, Grouping, InsightAlgorithmWithGroup } from "../../types";
 
 // const writeInsight = ({ groupName, positive, differencePercentage }) =>
 //   `${groupName} scored ${differencePercentage.toFixed(2)}% ${
@@ -17,12 +17,18 @@ const defaultWriteInsight = ({ groupName, positive, differencePercentage }) =>
     positive ? "higher" : "lower"
   } than the average of all groups.`;
 
-const outlierGroupPercentageDifferenceOfAverage: InsightAlgorithmWithGroup = (
-  data,
-  valueGetter,
-  groupGetter,
-  writeInsight = defaultWriteInsight
-) => {
+const outlierGroupPercentageDifferenceOfAverage: InsightAlgorithmWithGroup = ({
+  dataset,
+  grouping,
+  writeInsight = defaultWriteInsight,
+}: {
+  dataset: Dataset;
+  grouping: Grouping;
+  writeInsight;
+}) => {
+  const { data, valueGetter } = dataset;
+  const { getter: groupGetter } = grouping;
+
   if (!groupGetter(data[0])) {
     throw new Error(`Could not find group in data`);
   }

@@ -1,12 +1,16 @@
 import moment from "moment";
 import { getFileContents } from "../utils";
 import { linearRegression } from "simple-statistics";
+import { Dataset } from "../../types";
 
-const linearRegressionForecast = (
-  data: any[],
-  valueGetter: (item: any) => number,
-  dateGetter: (item: any) => Date
-) => {
+const linearRegressionForecast = ({
+  dataset,
+}: {
+  dataset: Dataset;
+  writeInsight;
+}) => {
+  const { data, valueGetter, dateGetter } = dataset;
+
   if (!valueGetter(data[0])) {
     throw new Error("Value getter must return a number");
   }

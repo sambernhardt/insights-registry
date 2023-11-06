@@ -1,24 +1,28 @@
 type valueGetter = (item: any) => number;
 type groupGetter = (item: any) => string;
+type dateGetter = (item: any) => Date;
 
 export type Insight = string | null;
 
 export type InsightAlgorithm = (data: any, valueGetter: valueGetter) => Insight;
 
 export type InsightGeneratorDefinition = {
-  id: number;
-  name: string;
   type: string;
   dataset: Dataset;
-  generator: () => Insight;
+  grouping?: Grouping;
+  writeInsight?: (params: any) => Insight;
 };
 
-export type InsightAlgorithmWithGroup = (
-  data: any,
-  valueGetter: valueGetter,
-  groupGetter: groupGetter,
-  writeInsight?: (params: any) => Insight
-) => Insight;
+export type Grouping = {
+  name: string;
+  getter: groupGetter;
+};
+
+export type InsightAlgorithmWithGroup = (args: {
+  dataset: Dataset;
+  grouping?: Grouping;
+  writeInsight?: (params: any) => Insight;
+}) => Insight;
 
 export type InsightGenerator = {
   id: string;
@@ -29,8 +33,6 @@ export type Dataset = {
   name: string;
   data: any[];
   valueGetter: valueGetter;
-  groupings: {
-    name: string;
-    getter: groupGetter;
-  }[];
+  dateGetter: dateGetter;
+  groupings: Grouping[];
 };
