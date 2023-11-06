@@ -1,6 +1,6 @@
 import { getCSVContents } from "./utils/utils";
 
-export const scoresDecreasing: {
+export const scoresDecreasingDataset: {
   submission_date: string;
   first_name: string;
   last_name: string;
@@ -20,7 +20,7 @@ submission_date,first_name,last_name,school,score
 2023-11-05,Cale,Ferdinand,North High School,1
 `);
 
-export const scoresIncreasing: {
+export const scoresIncreasingDataset: {
   submission_date: string;
   first_name: string;
   last_name: string;

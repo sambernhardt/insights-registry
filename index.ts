@@ -1,17 +1,11 @@
 import { InsightsRegistry } from "./insightRegistry";
-import {
-  outlierGroupPercentageDifferenceOfAverage,
-  zScoreSignificantOutlierGroup,
-} from "./utils/outliers";
-import { linearRegressionForecast } from "./utils/trends";
-import { scoresDecreasing, scoresIncreasing } from "./data";
+import { scoresDecreasingDataset, scoresIncreasingDataset } from "./data";
 import { Dataset } from "./types";
-import { repeatArrayItems } from "./utils/utils";
 
 let datasets: Dataset[] = [
   {
     name: "Proficiency scores: Planning 1.1",
-    data: scoresIncreasing,
+    data: scoresIncreasingDataset,
     valueGetter: (item) => item.score,
     dateGetter: (item) => new Date(item.submission_date),
     groupings: [
@@ -27,7 +21,7 @@ let datasets: Dataset[] = [
   },
   {
     name: "Proficiency scores: Planning 2.1",
-    data: scoresDecreasing,
+    data: scoresDecreasingDataset,
     valueGetter: (item) => item.score,
     dateGetter: (item) => new Date(item.submission_date),
     groupings: [
@@ -74,9 +68,9 @@ datasets.forEach((dataset, idx) => {
     });
   });
 
-  // | ------------|
+  // | -------|
   // | Trends |
-  // | ------------|
+  // | -------|
 
   // Eg. For the past 30 days, the data has been trending upwards
   registry.register({
